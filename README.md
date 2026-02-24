@@ -45,3 +45,11 @@ Sentra/
 │── voice.py
 │── actions.py
 │── requirements.txt
+
+🏗 Architecture
+
+Sentra follows a modular pipeline:
+
+Voice Input → Command Normalization → Intent Analysis → Router → Action Execution → Speech Output
+
+This architecture ensures scalability and clean code structure.
