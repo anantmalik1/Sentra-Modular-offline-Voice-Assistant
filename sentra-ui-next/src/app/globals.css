@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #070b14;
+  --bg-secondary: #0a1122;
+  --bg-panel: rgba(10, 20, 38, 0.65);
+  --border-cyan: rgba(0, 217, 255, 0.22);
+  --border-cyan-glow: rgba(0, 217, 255, 0.45);
+  --accent-cyan: #00d9ff;
+  --accent-green: #22c55e;
+  --accent-amber: #f59e0b;
+  --accent-red: #ef4444;
+}
+
+body, html {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-primary);
+  color: #f1f5f9;
+  overflow: hidden;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Background HUD Circuit & Grid Texture */
+.hud-bg-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: 
+    radial-gradient(circle at 50% 35%, rgba(13, 27, 60, 0.45) 0%, rgba(7, 11, 20, 0.98) 75%),
+    linear-gradient(to right, rgba(0, 217, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 217, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 36px 36px, 36px 36px;
+  z-index: 0;
+}
+
+/* Ambient Radial Glow */
+.hud-glow {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(0, 217, 255, 0.08) 0%, rgba(37, 99, 235, 0.03) 45%, transparent 70%);
+  filter: blur(75px);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Base HUD Panel with Glowing 1px Cyan Border */
+.hud-panel {
+  background: var(--bg-panel);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-cyan);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 0 1px 1px rgba(255, 255, 255, 0.02);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.hud-panel:hover {
+  border-color: var(--border-cyan-glow);
+  box-shadow: 0 0 15px rgba(0, 217, 255, 0.15), 0 4px 20px rgba(0, 0, 0, 0.7);
+}
+
+.hud-title {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 217, 255, 0.2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-cyan);
+}
