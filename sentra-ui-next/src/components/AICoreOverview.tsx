@@ -2,11 +2,25 @@
 
 import React from 'react';
 import { Cpu, Database, Radio, Bot, Sparkles, Activity } from 'lucide-react';
-import { MOCK_CORE_OVERVIEW } from '../data/mockData';
+import { useDashboard } from '@/context/DashboardContext';
 
 const ICONS = [Cpu, Database, Radio, Bot, Sparkles, Activity];
 
 export default function AICoreOverview() {
+  const { agents, providers, memoryStats } = useDashboard();
+
+  const activeAgentsCount = agents.filter((a) => a.status === 'Active').length;
+  const connectedProvidersCount = providers.filter((p) => p.connected).length;
+
+  const coreItems = [
+    { label: 'AI Core', value: 'Active', color: '#00d9ff' },
+    { label: 'Memory', value: `${memoryStats.memories.toLocaleString()} Stored`, color: '#00d9ff' },
+    { label: 'Voice', value: 'Online', color: '#22c55e' },
+    { label: 'Agents', value: `${activeAgentsCount} Running`, color: '#a855f7' },
+    { label: 'LLMs', value: `${connectedProvidersCount} Connected`, color: '#f59e0b' },
+    { label: 'System', value: 'Optimal', color: '#22c55e' },
+  ];
+
   return (
     <div className="hud-panel p-2 flex flex-col justify-between h-full w-[185px] flex-shrink-0">
       <div className="hud-title pb-1 border-b border-cyan-400/15 mb-1 text-[9.5px]">
@@ -14,7 +28,7 @@ export default function AICoreOverview() {
       </div>
 
       <div className="flex flex-col justify-between flex-1 gap-1 min-h-0">
-        {MOCK_CORE_OVERVIEW.map((item, idx) => {
+        {coreItems.map((item, idx) => {
           const Icon = ICONS[idx % ICONS.length];
           return (
             <div

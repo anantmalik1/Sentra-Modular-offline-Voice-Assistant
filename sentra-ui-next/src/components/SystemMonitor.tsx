@@ -1,13 +1,11 @@
 'use client';
 
 import React from 'react';
-import { MOCK_METRICS } from '../data/mockData';
+import { useDashboard } from '@/context/DashboardContext';
 
-interface SystemMonitorProps {
-  metrics?: typeof MOCK_METRICS;
-}
+export default function SystemMonitor() {
+  const { metrics } = useDashboard();
 
-export default function SystemMonitor({ metrics = MOCK_METRICS }: SystemMonitorProps) {
   const renderGauge = (label: string, value: number) => {
     const radius = 17;
     const circ = 2 * Math.PI * radius;

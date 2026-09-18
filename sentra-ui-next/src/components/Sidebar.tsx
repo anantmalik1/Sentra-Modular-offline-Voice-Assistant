@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   LayoutDashboard,
   Cpu,
@@ -15,24 +15,25 @@ import {
   Mic,
   Crosshair,
 } from 'lucide-react';
+import { useDashboard } from '@/context/DashboardContext';
 
 interface NavItem {
   id: string;
   label: string;
   icon: React.ElementType;
-  badge?: number;
+  badgeKey?: 'tasks' | 'conversations' | 'tools';
 }
 
 const NAV_ITEMS: NavItem[] = [
   { id: 'command_center', label: 'Command Center', icon: LayoutDashboard },
   { id: 'ai_core', label: 'AI Core', icon: Cpu },
   { id: 'agents', label: 'Agents', icon: Bot },
-  { id: 'tasks', label: 'Tasks', icon: CheckSquare, badge: 3 },
+  { id: 'tasks', label: 'Tasks', icon: CheckSquare, badgeKey: 'tasks' },
   { id: 'calendar', label: 'Calendar', icon: Calendar },
   { id: 'memory', label: 'Memory', icon: Database },
-  { id: 'conversations', label: 'Conversations', icon: MessageSquare, badge: 12 },
+  { id: 'conversations', label: 'Conversations', icon: MessageSquare, badgeKey: 'conversations' },
   { id: 'knowledge', label: 'Knowledge Base', icon: BookOpen },
-  { id: 'tools', label: 'Tools & Skills', icon: Wrench, badge: 18 },
+  { id: 'tools', label: 'Tools & Skills', icon: Wrench, badgeKey: 'tools' },
   { id: 'workflows', label: 'Workflows', icon: GitMerge },
 ];
 
@@ -41,6 +42,7 @@ interface SidebarProps {
   onSelectNav: (id: string) => void;
   isListening: boolean;
   onToggleMic: () => void;
+  audioLevel?: number;
 }
 
 export default function Sidebar({
@@ -48,7 +50,10 @@ export default function Sidebar({
   onSelectNav,
   isListening,
   onToggleMic,
+  audioLevel = 0,
 }: SidebarProps) {
+  const { badgeCounts } = useDashboard();
+
   return (
     <aside className="hud-panel p-2 flex flex-col justify-between h-full w-[210px] flex-shrink-0">
       {/* 1. Navigation items */}
@@ -56,11 +61,13 @@ export default function Sidebar({
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = activeNav === item.id;
+          const count = item.badgeKey ? badgeCounts[item.badgeKey] : undefined;
+
           return (
             <button
               key={item.id}
               onClick={() => onSelectNav(item.id)}
-              className={`flex items-center justify-between w-full px-2.5 py-1.5 rounded-md text-[10.5px] font-mono transition-all ${
+              className={`flex items-center justify-between w-full px-2.5 py-1.5 rounded-md text-[10.5px] font-mono transition-all cursor-pointer ${
                 isActive
                   ? 'bg-cyan-950/70 border-l-2 border-l-cyan-400 border border-cyan-400/30 text-cyan-300 shadow-[0_0_10px_rgba(0,217,255,0.2)] font-semibold'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 border border-transparent'
@@ -70,9 +77,9 @@ export default function Sidebar({
                 <Icon size={13} className={isActive ? 'text-cyan-400' : 'text-slate-500'} />
                 <span className="truncate">{item.label}</span>
               </div>
-              {item.badge && (
+              {count !== undefined && count > 0 && (
                 <span className="font-mono text-[8.5px] font-bold px-1.5 py-0.2 rounded-full bg-blue-500/20 text-cyan-400 border border-cyan-400/30">
-                  {item.badge}
+                  {count}
                 </span>
               )}
             </button>
@@ -89,21 +96,27 @@ export default function Sidebar({
           <span className="text-[10px] text-slate-500">›</span>
         </div>
 
-        {/* Animated Audio Waveform Bars */}
+        {/* Animated Audio Waveform Bars driven by Web Audio Analyser level */}
         <div className="flex items-center justify-center space-x-1 w-full h-6 my-1">
-          {[4, 10, 16, 8, 20, 12, 6, 18, 14, 8, 16, 6].map((h, i) => (
-            <div
-              key={i}
-              className={`w-1 rounded-full transition-all duration-150 ${
-                isListening
-                  ? 'bg-emerald-400 animate-pulse shadow-[0_0_4px_#22c55e]'
-                  : 'bg-cyan-400/50'
-              }`}
-              style={{
-                height: isListening ? `${Math.max(h * 1.2, 4)}px` : `${Math.max(h * 0.4, 3)}px`,
-              }}
-            />
-          ))}
+          {[4, 10, 16, 8, 20, 12, 6, 18, 14, 8, 16, 6].map((h, i) => {
+            const dynamicH = isListening
+              ? Math.max(h * 0.8 + audioLevel * 25, 4)
+              : Math.max(h * 0.35, 3);
+
+            return (
+              <div
+                key={i}
+                className={`w-1 rounded-full transition-all duration-150 ${
+                  isListening
+                    ? 'bg-emerald-400 shadow-[0_0_4px_#22c55e]'
+                    : 'bg-cyan-400/50'
+                }`}
+                style={{
+                  height: `${dynamicH}px`,
+                }}
+              />
+            );
+          })}
         </div>
 
         <span className="font-mono text-[9px] text-slate-400 mb-1.5">
@@ -137,7 +150,7 @@ export default function Sidebar({
         </span>
 
         {/* Focus Mode Button */}
-        <button className="flex items-center justify-center space-x-1.5 w-full py-1 mt-2 rounded bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 text-slate-300 hover:text-cyan-300 text-[9.5px] font-mono transition-colors">
+        <button className="flex items-center justify-center space-x-1.5 w-full py-1 mt-2 rounded bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 text-slate-300 hover:text-cyan-300 text-[9.5px] font-mono transition-colors cursor-pointer">
           <Crosshair size={11} className="text-cyan-400" />
           <span>Focus Mode</span>
         </button>

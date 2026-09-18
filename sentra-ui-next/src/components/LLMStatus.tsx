@@ -1,10 +1,15 @@
 'use client';
 
 import React from 'react';
-import { MOCK_PROVIDERS } from '../data/mockData';
+import { useDashboard } from '@/context/DashboardContext';
 
-export default function LLMStatus() {
-  const connectedCount = MOCK_PROVIDERS.filter((p) => p.connected).length;
+interface LLMStatusProps {
+  onOpenManage?: () => void;
+}
+
+export default function LLMStatus({ onOpenManage }: LLMStatusProps) {
+  const { providers, toggleProvider } = useDashboard();
+  const connectedCount = providers.filter((p) => p.connected).length;
 
   return (
     <div className="hud-panel p-2 flex flex-col justify-between h-full w-full">
@@ -18,10 +23,12 @@ export default function LLMStatus() {
 
       {/* 3x3 Grid of Providers */}
       <div className="grid grid-cols-3 grid-rows-3 gap-1 flex-1 min-h-0">
-        {MOCK_PROVIDERS.map((p) => (
+        {providers.map((p) => (
           <div
             key={p.id}
-            className="flex items-center space-x-1.5 px-1.5 py-0.5 rounded transition-all"
+            onClick={() => toggleProvider(p.id)}
+            className="flex items-center space-x-1.5 px-1.5 py-0.5 rounded transition-all cursor-pointer hover:border-cyan-400/50"
+            title="Click to toggle connection"
             style={{
               background: p.connected
                 ? 'rgba(0, 217, 255, 0.08)'
@@ -55,7 +62,10 @@ export default function LLMStatus() {
 
       {/* Footer link */}
       <div className="pt-0.5 border-t border-cyan-400/10 text-center">
-        <button className="text-[8px] font-mono text-cyan-400 hover:underline">
+        <button
+          onClick={onOpenManage}
+          className="text-[8px] font-mono text-cyan-400 hover:underline cursor-pointer"
+        >
           Manage Providers ›
         </button>
       </div>

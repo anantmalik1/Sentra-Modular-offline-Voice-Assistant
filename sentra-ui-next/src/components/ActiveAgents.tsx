@@ -2,31 +2,53 @@
 
 import React from 'react';
 import { Code2, Search, Database, Globe, CheckSquare, Terminal } from 'lucide-react';
-import { MOCK_AGENTS } from '../data/mockData';
+import { useDashboard } from '@/context/DashboardContext';
+import { Agent } from '@/types/dashboard';
 
-const ICONS = [Code2, Search, Database, Globe, CheckSquare, Terminal];
+const ICONS: Record<string, React.ElementType> = {
+  coding: Code2,
+  research: Search,
+  memory: Database,
+  browser: Globe,
+  task: CheckSquare,
+  system: Terminal,
+};
 
-export default function ActiveAgents() {
+interface ActiveAgentsProps {
+  onSelectAgent?: (agent: Agent) => void;
+}
+
+export default function ActiveAgents({ onSelectAgent }: ActiveAgentsProps) {
+  const { agents, toggleAgent } = useDashboard();
+
   return (
     <div className="hud-panel p-2 flex flex-col justify-between h-full w-full">
       {/* Header */}
       <div className="flex items-center justify-between pb-1 mb-1 border-b border-cyan-400/15">
         <span className="hud-title text-[9.5px]">ACTIVE AGENTS</span>
-        <button className="text-[8.5px] font-mono text-cyan-400 hover:underline">
-          View All ›
-        </button>
+        <span className="text-[8px] font-mono text-cyan-400">
+          {agents.filter((a) => a.status === 'Active').length} Active
+        </span>
       </div>
 
       {/* Grid of Agent Cards */}
       <div className="grid grid-cols-3 grid-rows-2 gap-1.5 flex-1 min-h-0">
-        {MOCK_AGENTS.map((agent, idx) => {
-          const Icon = ICONS[idx % ICONS.length];
+        {agents.map((agent) => {
+          const Icon = ICONS[agent.id] || Code2;
           const isActive = agent.status === 'Active';
 
           return (
             <div
               key={agent.id}
-              className="p-1.5 rounded-md bg-[#071124]/75 border border-cyan-400/10 hover:border-cyan-400/30 flex flex-col justify-between transition-all"
+              onClick={() => {
+                if (onSelectAgent) {
+                  onSelectAgent(agent);
+                } else {
+                  toggleAgent(agent.id);
+                }
+              }}
+              className="p-1.5 rounded-md bg-[#071124]/75 border border-cyan-400/10 hover:border-cyan-400/30 flex flex-col justify-between transition-all cursor-pointer hover:shadow-[0_0_10px_rgba(0,217,255,0.15)]"
+              title="Click to toggle Active / Standby"
             >
               <div className="flex items-center space-x-1.5 truncate">
                 <div

@@ -1,9 +1,11 @@
 'use client';
 
 import React from 'react';
-import { MOCK_MEMORY_STATS } from '../data/mockData';
+import { useDashboard } from '@/context/DashboardContext';
 
 export default function MemoryInsights() {
+  const { memoryStats } = useDashboard();
+
   const points = [
     { x: 12, y: 38 },
     { x: 28, y: 22 },
@@ -59,19 +61,19 @@ export default function MemoryInsights() {
           <div>
             <div className="font-mono text-[7px] text-slate-400 uppercase">Memories</div>
             <div className="font-mono text-xs font-bold text-slate-100 leading-tight">
-              {MOCK_MEMORY_STATS.memories.toLocaleString()}
+              {memoryStats.memories.toLocaleString()}
             </div>
           </div>
           <div>
             <div className="font-mono text-[7px] text-slate-400 uppercase">Session Turns</div>
             <div className="font-mono text-[9.5px] font-bold text-slate-100 leading-tight">
-              {MOCK_MEMORY_STATS.sessionTurns}
+              {memoryStats.sessionTurns}
             </div>
           </div>
           <div>
             <div className="font-mono text-[7px] text-slate-400 uppercase">Tool Calls</div>
             <div className="font-mono text-[9.5px] font-bold text-slate-100 leading-tight">
-              {MOCK_MEMORY_STATS.toolCalls}
+              {memoryStats.toolCalls}
             </div>
           </div>
         </div>
@@ -79,7 +81,7 @@ export default function MemoryInsights() {
 
       {/* Footer link */}
       <div className="pt-0.5 border-t border-cyan-400/10 text-center">
-        <button className="text-[8px] font-mono text-cyan-400 hover:underline">
+        <button className="text-[8px] font-mono text-cyan-400 hover:underline cursor-pointer">
           View Memory Map ›
         </button>
       </div>
