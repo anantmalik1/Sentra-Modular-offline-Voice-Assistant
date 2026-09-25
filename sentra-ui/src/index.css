@@ -1,0 +1,203 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #070b14;
+  --bg-secondary: #0a1122;
+  --bg-panel: rgba(10, 20, 38, 0.7);
+  --border-cyan: rgba(0, 217, 255, 0.25);
+  --border-cyan-glow: rgba(0, 217, 255, 0.55);
+  --accent-cyan: #00d9ff;
+  --accent-green: #22c55e;
+  --accent-amber: #f59e0b;
+  --accent-red: #ef4444;
+}
+
+@theme {
+  --color-cyan-glow: rgba(0, 217, 255, 0.5);
+  --color-hud-cyan: #00d9ff;
+  --color-hud-panel: rgba(10, 20, 38, 0.7);
+  --color-hud-border: rgba(0, 217, 255, 0.25);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-primary);
+  color: #f1f5f9;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+  overflow-y: auto;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Background Cyber Grid & Vignette */
+.cyber-background {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: 
+    radial-gradient(circle at 50% 35%, rgba(13, 27, 60, 0.45) 0%, rgba(7, 11, 20, 0.98) 75%),
+    linear-gradient(to right, rgba(0, 217, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 217, 255, 0.025) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+}
+
+.cyber-grid-glow {
+  position: fixed;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(circle, rgba(0, 217, 255, 0.1) 0%, rgba(37, 99, 235, 0.03) 45%, transparent 70%);
+  filter: blur(90px);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Base Glass HUD Panel */
+.hud-panel {
+  background: var(--bg-panel);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-cyan);
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 217, 255, 0.15), 0 4px 20px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hud-panel:hover {
+  border-color: var(--border-cyan-glow);
+  box-shadow: 0 0 20px rgba(0, 217, 255, 0.25), 0 6px 25px rgba(0, 0, 0, 0.7);
+}
+
+/* Panel Header typography: ~14px uppercase */
+.hud-panel-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem; /* ~14px */
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #cbd5e1;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8125rem; /* ~13px */
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 217, 255, 0.3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00d9ff;
+}
+
+/* Global Layout Grid - Natural Growth with Safe Padding */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+  padding: 12px 16px 20px 16px;
+  gap: 14px;
+  box-sizing: border-box;
+}
+
+.dashboard-main {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr) 340px;
+  gap: 14px;
+  align-items: start;
+}
+
+/* Center Content Column Grid */
+.center-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Center Row 1: Overview + Hero Orb */
+.center-row-top {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 14px;
+  min-height: 340px;
+}
+
+/* Center Row 2: Active Agents (left) + Mission Timeline & Quick Commands (right) */
+.center-row-mid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.15fr);
+  gap: 14px;
+}
+
+.timeline-quick-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 14px;
+}
+
+/* Center Row 3: System Monitor (CPU/RAM/Disk) + Memory Insights + LLM Status */
+.center-row-bottom {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr) minmax(0, 1.35fr);
+  gap: 14px;
+}
+
+/* Responsive scaling for medium and small desktops */
+@media (max-width: 1536px) {
+  .dashboard-main {
+    grid-template-columns: 260px minmax(0, 1fr) 310px;
+    gap: 12px;
+  }
+  .center-row-top {
+    grid-template-columns: 220px minmax(0, 1fr);
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 1280px) {
+  .dashboard-main {
+    grid-template-columns: 240px minmax(0, 1fr) 280px;
+    gap: 10px;
+  }
+}
