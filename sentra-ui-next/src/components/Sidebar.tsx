@@ -55,9 +55,9 @@ export default function Sidebar({
   const { badgeCounts } = useDashboard();
 
   return (
-    <aside className="hud-panel p-2 flex flex-col justify-between h-full w-[210px] flex-shrink-0">
+    <aside className="hud-panel p-6 flex flex-col justify-between h-full w-[260px] flex-shrink-0">
       {/* 1. Navigation items */}
-      <nav className="space-y-0.5 overflow-y-auto pr-0.5">
+      <nav className="space-y-1.5 overflow-y-auto pr-0.5">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = activeNav === item.id;
@@ -67,18 +67,18 @@ export default function Sidebar({
             <button
               key={item.id}
               onClick={() => onSelectNav(item.id)}
-              className={`flex items-center justify-between w-full px-2.5 py-1.5 rounded-md text-[10.5px] font-mono transition-all cursor-pointer ${
+              className={`flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-[16px] font-mono transition-all cursor-pointer ${
                 isActive
                   ? 'bg-cyan-950/70 border-l-2 border-l-cyan-400 border border-cyan-400/30 text-cyan-300 shadow-[0_0_10px_rgba(0,217,255,0.2)] font-semibold'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 border border-transparent'
               }`}
             >
-              <div className="flex items-center space-x-2 truncate">
-                <Icon size={13} className={isActive ? 'text-cyan-400' : 'text-slate-500'} />
+              <div className="flex items-center space-x-3 truncate">
+                <Icon size={22} className={isActive ? 'text-cyan-400' : 'text-slate-500'} />
                 <span className="truncate">{item.label}</span>
               </div>
               {count !== undefined && count > 0 && (
-                <span className="font-mono text-[8.5px] font-bold px-1.5 py-0.2 rounded-full bg-blue-500/20 text-cyan-400 border border-cyan-400/30">
+                <span className="font-mono text-sm font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-cyan-400 border border-cyan-400/30">
                   {count}
                 </span>
               )}
@@ -88,27 +88,27 @@ export default function Sidebar({
       </nav>
 
       {/* 2. Bottom VOICE STATUS HUD Card */}
-      <div className="p-2 rounded-lg bg-[#071022]/90 border border-cyan-400/25 flex flex-col items-center mt-2 relative">
+      <div className="p-4 rounded-xl bg-[#071022]/90 border border-cyan-400/25 flex flex-col items-center mt-3 relative">
         <div className="flex items-center justify-between w-full mb-1">
-          <span className="font-mono text-[8.5px] font-bold text-cyan-400 tracking-wider uppercase">
+          <span className="font-mono text-base font-bold text-cyan-400 tracking-wider uppercase">
             VOICE STATUS
           </span>
-          <span className="text-[10px] text-slate-500">›</span>
+          <span className="text-base text-slate-500">›</span>
         </div>
 
         {/* Animated Audio Waveform Bars driven by Web Audio Analyser level */}
-        <div className="flex items-center justify-center space-x-1 w-full h-6 my-1">
+        <div className="flex items-center justify-center space-x-1.5 w-full h-8 my-2">
           {[4, 10, 16, 8, 20, 12, 6, 18, 14, 8, 16, 6].map((h, i) => {
             const dynamicH = isListening
-              ? Math.max(h * 0.8 + audioLevel * 25, 4)
-              : Math.max(h * 0.35, 3);
+              ? Math.max(h * 0.9 + audioLevel * 30, 6)
+              : Math.max(h * 0.45, 4);
 
             return (
               <div
                 key={i}
-                className={`w-1 rounded-full transition-all duration-150 ${
+                className={`w-1.5 rounded-full transition-all duration-150 ${
                   isListening
-                    ? 'bg-emerald-400 shadow-[0_0_4px_#22c55e]'
+                    ? 'bg-emerald-400 shadow-[0_0_6px_#22c55e]'
                     : 'bg-cyan-400/50'
                 }`}
                 style={{
@@ -119,12 +119,12 @@ export default function Sidebar({
           })}
         </div>
 
-        <span className="font-mono text-[9px] text-slate-400 mb-1.5">
-          {isListening ? 'Listening...' : 'Idle Standby'}
+        <span className={`font-mono text-base font-bold mb-2 uppercase tracking-wider ${isListening ? 'text-emerald-400 animate-pulse' : 'text-slate-400'}`}>
+          {isListening ? 'LISTENING...' : 'IDLE / STANDBY'}
         </span>
 
         {/* Large Circular Glowing Mic Button */}
-        <div className="relative my-1">
+        <div className="relative my-2">
           <div
             className={`absolute -inset-2 rounded-full transition-all ${
               isListening
@@ -134,24 +134,24 @@ export default function Sidebar({
           />
           <button
             onClick={onToggleMic}
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all relative z-10 cursor-pointer ${
+            className={`w-14 h-14 rounded-full flex items-center justify-center transition-all relative z-10 cursor-pointer ${
               isListening
                 ? 'bg-emerald-950 border-2 border-emerald-400 text-emerald-300 shadow-[0_0_20px_rgba(34,197,94,0.7)]'
                 : 'bg-cyan-950/80 border border-cyan-400 text-cyan-300 hover:shadow-[0_0_15px_rgba(0,217,255,0.4)]'
             }`}
-            title="Tap to speak"
+            title={isListening ? "Listening... click to stop" : "Tap to speak"}
           >
-            <Mic size={18} />
+            <Mic size={22} className={isListening ? "animate-bounce" : ""} />
           </button>
         </div>
 
-        <span className="font-mono text-[8.5px] uppercase tracking-wider text-slate-400 mt-1">
-          Tap to Speak
+        <span className={`font-mono text-base uppercase tracking-wider mt-1 font-bold ${isListening ? 'text-emerald-300' : 'text-slate-400'}`}>
+          {isListening ? 'Listening to voice...' : 'Tap to Speak'}
         </span>
 
         {/* Focus Mode Button */}
-        <button className="flex items-center justify-center space-x-1.5 w-full py-1 mt-2 rounded bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 text-slate-300 hover:text-cyan-300 text-[9.5px] font-mono transition-colors cursor-pointer">
-          <Crosshair size={11} className="text-cyan-400" />
+        <button className="flex items-center justify-center space-x-2 w-full py-2 mt-3 rounded-lg bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 text-slate-300 hover:text-cyan-300 text-base font-mono font-medium transition-colors cursor-pointer">
+          <Crosshair size={16} className="text-cyan-400" />
           <span>Focus Mode</span>
         </button>
       </div>

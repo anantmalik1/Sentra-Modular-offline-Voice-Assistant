@@ -22,34 +22,34 @@ export default function AICoreOverview() {
   ];
 
   return (
-    <div className="hud-panel p-2 flex flex-col justify-between h-full w-[185px] flex-shrink-0">
-      <div className="hud-title pb-1 border-b border-cyan-400/15 mb-1 text-[9.5px]">
+    <div className="hud-panel p-6 flex flex-col justify-between h-full w-[250px] flex-shrink-0">
+      <div className="hud-title pb-2 border-b border-cyan-400/15 mb-2">
         AI CORE OVERVIEW
       </div>
 
-      <div className="flex flex-col justify-between flex-1 gap-1 min-h-0">
+      <div className="flex flex-col justify-between flex-1 gap-2.5 min-h-0">
         {coreItems.map((item, idx) => {
           const Icon = ICONS[idx % ICONS.length];
           return (
             <div
               key={idx}
-              className="flex items-center space-x-2 p-1.5 rounded-md bg-[#071124]/75 border border-cyan-400/10 hover:border-cyan-400/30 transition-all"
+              className="flex items-center space-x-3 p-2.5 rounded-lg bg-[#071124]/75 border border-cyan-400/10 hover:border-cyan-400/30 transition-all"
             >
               <div
-                className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0"
+                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                 style={{
-                  background: `${item.color}15`,
+                  background: `${item.color}18`,
                   color: item.color,
                 }}
               >
-                <Icon size={11} />
+                <Icon size={18} />
               </div>
               <div className="flex flex-col min-w-0 leading-tight">
-                <span className="font-mono text-[9px] text-slate-300 font-semibold truncate">
+                <span className="font-mono text-[16px] text-slate-300 font-semibold truncate">
                   {item.label}
                 </span>
                 <span
-                  className="font-mono text-[8px] font-bold truncate"
+                  className="font-mono text-[19px] font-bold truncate mt-0.5"
                   style={{ color: item.color }}
                 >
                   {item.value}

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/db';
 import { tasks, conversations, memoryEntries } from '@/db/schema';
-import { eq, like, or } from 'drizzle-orm';
+import { eq, like, or, and } from 'drizzle-orm';
 
 export async function GET(req: Request) {
   const user = await getCurrentUser();
@@ -26,7 +26,7 @@ export async function GET(req: Request) {
         detail: tasks.time,
       })
       .from(tasks)
-      .where(or(like(tasks.title, queryPattern)))
+      .where(and(eq(tasks.userId, user.userId), like(tasks.title, queryPattern)))
       .limit(5),
 
     db
@@ -36,7 +36,12 @@ export async function GET(req: Request) {
         detail: conversations.transcript,
       })
       .from(conversations)
-      .where(or(like(conversations.title, queryPattern), like(conversations.transcript, queryPattern)))
+      .where(
+        and(
+          eq(conversations.userId, user.userId),
+          or(like(conversations.title, queryPattern), like(conversations.transcript, queryPattern))
+        )
+      )
       .limit(5),
 
     db
@@ -46,7 +51,12 @@ export async function GET(req: Request) {
         detail: memoryEntries.value,
       })
       .from(memoryEntries)
-      .where(or(like(memoryEntries.key, queryPattern), like(memoryEntries.value, queryPattern)))
+      .where(
+        and(
+          eq(memoryEntries.userId, user.userId),
+          or(like(memoryEntries.key, queryPattern), like(memoryEntries.value, queryPattern))
+        )
+      )
       .limit(5),
   ]);
 

@@ -90,3 +90,13 @@ export const feedActivities = sqliteTable('feed_activities', {
   time: text('time').notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 });
+
+// Contacts table (scoped to user_id for voice-driven WhatsApp / comms)
+export const contacts = sqliteTable('contacts', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  phone: text('phone').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+});
+

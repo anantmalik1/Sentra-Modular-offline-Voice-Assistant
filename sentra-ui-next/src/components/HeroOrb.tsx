@@ -151,17 +151,17 @@ export default function HeroOrb({ isListening = false }: HeroOrbProps) {
       {/* Futuristic Center Overlay Text: SENTRA / AI CORE / v3.0.0 */}
       <div className="absolute z-20 pointer-events-none flex flex-col items-center justify-center text-center">
         <span
-          className="font-mono font-black tracking-[0.25em] text-cyan-300 uppercase leading-none text-base sm:text-lg"
+          className="font-mono font-black tracking-[0.25em] text-cyan-300 uppercase leading-none text-[22px] sm:text-[24px]"
           style={{
-            textShadow: '0 0 12px rgba(0, 217, 255, 0.9), 0 0 24px rgba(0, 217, 255, 0.5)',
+            textShadow: '0 0 14px rgba(0, 217, 255, 0.9), 0 0 28px rgba(0, 217, 255, 0.5)',
           }}
         >
           SENTRA
         </span>
-        <span className="font-mono tracking-[0.22em] text-slate-200 uppercase text-[9px] mt-1.5 leading-none">
+        <span className="font-mono tracking-[0.22em] text-slate-200 uppercase text-[16px] mt-2 leading-none font-bold">
           AI CORE
         </span>
-        <span className="font-mono text-[8px] text-cyan-400/80 mt-1 tracking-wider">
+        <span className="font-mono text-[14px] text-cyan-400 mt-1.5 tracking-wider font-semibold">
           v3.0.0
         </span>
       </div>

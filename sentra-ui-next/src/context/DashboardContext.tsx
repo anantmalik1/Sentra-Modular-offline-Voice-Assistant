@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { Agent, IntelligenceItem, TimelineTask, LLMProvider, SystemMetrics, MemoryStats } from '@/types/dashboard';
+import { Agent, IntelligenceItem, TimelineTask, LLMProvider, SystemMetrics, MemoryStats, MemoryItem, ConversationItem } from '@/types/dashboard';
 
 interface UserProfile {
   userId: string;
@@ -18,6 +18,8 @@ interface DashboardContextType {
   agents: Agent[];
   providers: LLMProvider[];
   activities: IntelligenceItem[];
+  memories: MemoryItem[];
+  conversations: ConversationItem[];
   metrics: SystemMetrics;
   memoryStats: MemoryStats;
   badgeCounts: { tasks: number; conversations: number; tools: number };
@@ -41,6 +43,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [providers, setProviders] = useState<LLMProvider[]>([]);
   const [activities, setActivities] = useState<IntelligenceItem[]>([]);
+  const [memories, setMemories] = useState<MemoryItem[]>([]);
+  const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [badgeCounts, setBadgeCounts] = useState({ tasks: 0, conversations: 0, tools: 18 });
   const [metrics, setMetrics] = useState<SystemMetrics>({ cpu: 15, ram: 54, disk: 40 });
   const [memoryStats, setMemoryStats] = useState<MemoryStats>({ memories: 0, sessionTurns: 0, toolCalls: 0 });
@@ -61,6 +65,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       setAgents(data.agents || []);
       setProviders(data.providers || []);
       setActivities(data.activities || []);
+      setMemories(data.memories || []);
+      setConversations(data.conversations || []);
       if (data.badgeCounts) setBadgeCounts(data.badgeCounts);
       if (data.stats) {
         setMemoryStats({
@@ -212,6 +218,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         agents,
         providers,
         activities,
+        memories,
+        conversations,
         metrics,
         memoryStats,
         badgeCounts,

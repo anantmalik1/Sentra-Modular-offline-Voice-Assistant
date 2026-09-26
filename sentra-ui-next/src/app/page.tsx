@@ -16,10 +16,14 @@ import BottomBar from '@/components/BottomBar';
 import SubView from '@/components/SubView';
 import NewTaskModal from '@/components/NewTaskModal';
 import ProvidersModal from '@/components/ProvidersModal';
+import QuickSwitcherModal from '@/components/QuickSwitcherModal';
+import SettingsModal from '@/components/SettingsModal';
+import ExecutiveBriefingModal from '@/components/ExecutiveBriefingModal';
+import { executeVoiceOrWebCommand } from '@/lib/commandParser';
 import { DashboardProvider, useDashboard } from '@/context/DashboardContext';
 
 function DashboardContent() {
-  const { pushActivity } = useDashboard();
+  const { pushActivity, createTask, tasks } = useDashboard();
   const [activeNav, setActiveNav] = useState('command_center');
   const [isListening, setIsListening] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
@@ -27,6 +31,9 @@ function DashboardContent() {
   // Modals
   const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
   const [isProvidersOpen, setIsProvidersOpen] = useState(false);
+  const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isBriefingOpen, setIsBriefingOpen] = useState(false);
 
   // Audio Context & Speech Recognition Refs
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -64,7 +71,7 @@ function DashboardContent() {
       };
       updateLevel();
     } catch (e) {
-      // Gentle audio bounce fallback if microphone permission is denied in test environments
+      // Gentle audio bounce fallback if microphone permission is denied or pending in test environments
       let phase = 0;
       const mockLoop = () => {
         phase += 0.2;
@@ -89,6 +96,7 @@ function DashboardContent() {
   };
 
   const stopVoiceRecognition = () => {
+    console.log('[SENTRA Voice] stopVoiceRecognition called');
     if (recognitionRef.current) {
       try {
         recognitionRef.current.abort();
@@ -100,21 +108,24 @@ function DashboardContent() {
   };
 
   const startVoiceRecognition = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-
+    // Immediate visible state change on click
     setIsListening(true);
     startAudioAnalyser();
 
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
     if (!SpeechRecognition) {
-      // Simulate speech recognition capture if browser doesn't support Web Speech API
-      setTimeout(() => {
+      console.warn('[SENTRA Voice] Web Speech API not supported in this browser environment. Using demo simulated directive.');
+      setTimeout(async () => {
         const sampleCommands = [
-          'Run automated security diagnostics',
-          'Audit active agents and host memory',
-          'Deploy code pipeline v3.0',
+          'open youtube',
+          'play synthwave radio',
+          'search for quantum computing',
+          'create task Review mission parameters',
         ];
         const spoken = sampleCommands[Math.floor(Math.random() * sampleCommands.length)];
-        pushActivity(`"${spoken}"`, 'Voice Directive Ingested & Saved', 'LIVE', true, spoken);
+        const res = await executeVoiceOrWebCommand(spoken, { createTask, tasks });
+        await pushActivity(res.feedbackTitle, res.feedbackDesc, res.tag, true, spoken);
         stopAudioAnalyser();
         setIsListening(false);
       }, 2500);
@@ -128,27 +139,40 @@ function DashboardContent() {
       recognition.lang = 'en-US';
       recognitionRef.current = recognition;
 
+      recognition.onstart = () => {
+        console.log('[SENTRA Voice] recognition.onstart - Microphone listening active');
+      };
+
       recognition.onresult = async (event: any) => {
-        const transcript = event.results[0][0].transcript;
+        console.log('[SENTRA Voice] recognition.onresult fired', event);
+        const transcript = event.results[0][0]?.transcript;
         if (transcript) {
-          await pushActivity(`"${transcript.trim()}"`, 'Voice Directive Ingested', 'LIVE', true, transcript.trim());
+          const trimmed = transcript.trim();
+          console.log('[SENTRA Voice] Transcribed speech:', trimmed);
+          // Execute command parser
+          const result = await executeVoiceOrWebCommand(trimmed, { createTask, tasks });
+          await pushActivity(result.feedbackTitle, result.feedbackDesc, result.tag, true, trimmed);
         }
         stopAudioAnalyser();
         setIsListening(false);
       };
 
-      recognition.onerror = () => {
+      recognition.onerror = (err: any) => {
+        console.warn('[SENTRA Voice] recognition.onerror:', err.error, err);
         stopAudioAnalyser();
         setIsListening(false);
       };
 
       recognition.onend = () => {
+        console.log('[SENTRA Voice] recognition.onend');
         stopAudioAnalyser();
         setIsListening(false);
       };
 
       recognition.start();
-    } catch {
+      console.log('[SENTRA Voice] recognition.start() initiated successfully');
+    } catch (err) {
+      console.error('[SENTRA Voice] Failed to start recognition instance:', err);
       stopAudioAnalyser();
       setIsListening(false);
     }
@@ -163,17 +187,20 @@ function DashboardContent() {
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden flex flex-col justify-between p-2 gap-2 bg-[#070b14] z-10 box-border">
+    <div className="relative w-screen min-h-screen flex flex-col justify-between p-4 gap-4 bg-[#070b14] z-10 box-border overflow-y-auto">
       {/* Background Cyber Grid & Glow */}
       <div className="hud-bg-grid" />
       <div className="hud-glow" />
 
       {/* 1. TOP BAR */}
-      <TopBar onOpenSettings={() => setIsProvidersOpen(true)} />
+      <TopBar
+        onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenSwitcher={() => setIsSwitcherOpen(true)}
+      />
 
       {/* 2. MAIN WORKSPACE */}
       {activeNav !== 'command_center' ? (
-        <main className="flex-1 min-h-0 flex gap-2 overflow-hidden z-10">
+        <main className="flex-1 flex gap-4 min-h-[750px] z-10">
           <Sidebar
             activeNav={activeNav}
             onSelectNav={setActiveNav}
@@ -188,8 +215,8 @@ function DashboardContent() {
           />
         </main>
       ) : (
-        <main className="flex-1 min-h-0 flex gap-2 overflow-hidden z-10">
-          {/* LEFT SIDEBAR (~210px) */}
+        <main className="flex-1 flex gap-4 z-10">
+          {/* LEFT SIDEBAR (~260px) */}
           <Sidebar
             activeNav={activeNav}
             onSelectNav={setActiveNav}
@@ -198,24 +225,24 @@ function DashboardContent() {
             audioLevel={audioLevel}
           />
 
-          {/* CENTER STAGE (3 Rows) */}
-          <div className="flex-1 flex flex-col gap-2 min-h-0 min-w-0 overflow-hidden">
+          {/* CENTER STAGE (3 Spacious Rows) */}
+          <div className="flex-1 flex flex-col gap-4 min-w-0">
             {/* Row 1: AI CORE OVERVIEW (Left) + CENTER HERO ORB (Right) */}
-            <div className="flex-1 flex gap-2 min-h-0 min-w-0">
+            <div className="flex gap-4 min-h-[380px]">
               <AICoreOverview />
               <HeroOrb isListening={isListening} />
             </div>
 
             {/* Row 2: ACTIVE AGENTS (Left) + MISSION TIMELINE & QUICK COMMANDS (Right) */}
-            <div className="h-[145px] flex gap-2 min-h-0 min-w-0">
+            <div className="flex gap-4 min-h-[280px]">
               <div className="flex-1 min-w-0">
                 <ActiveAgents />
               </div>
-              <div className="w-[390px] flex gap-2 min-w-0 flex-shrink-0">
+              <div className="w-[440px] flex gap-4 min-w-0 flex-shrink-0">
                 <div className="flex-1 min-w-0">
                   <MissionTimeline />
                 </div>
-                <div className="w-[155px] min-w-0 flex-shrink-0">
+                <div className="w-[190px] min-w-0 flex-shrink-0">
                   <QuickCommands
                     onOpenNewTask={() => setIsNewTaskOpen(true)}
                     onOpenCalendar={() => setActiveNav('calendar')}
@@ -226,20 +253,20 @@ function DashboardContent() {
             </div>
 
             {/* Row 3: SYSTEM MONITOR + MEMORY INSIGHTS + LLM STATUS */}
-            <div className="h-[135px] flex gap-2 min-h-0 min-w-0">
-              <div className="w-[200px] flex-shrink-0 min-w-0">
+            <div className="flex gap-4 min-h-[220px]">
+              <div className="w-[260px] flex-shrink-0 min-w-0">
                 <SystemMonitor />
               </div>
               <div className="flex-1 min-w-0">
                 <MemoryInsights />
               </div>
-              <div className="w-[290px] flex-shrink-0 min-w-0">
+              <div className="w-[340px] flex-shrink-0 min-w-0">
                 <LLMStatus onOpenManage={() => setIsProvidersOpen(true)} />
               </div>
             </div>
           </div>
 
-          {/* RIGHT COLUMN: LIVE INTELLIGENCE FEED (~255px) */}
+          {/* RIGHT COLUMN: LIVE INTELLIGENCE FEED (~320px) */}
           <LiveFeed onOpenTasks={() => setActiveNav('tasks')} />
         </main>
       )}
@@ -248,6 +275,7 @@ function DashboardContent() {
       <BottomBar
         isListening={isListening}
         onToggleMic={handleToggleMic}
+        onOpenBriefing={() => setIsBriefingOpen(true)}
       />
 
       {/* MODALS */}
@@ -259,6 +287,25 @@ function DashboardContent() {
       <ProvidersModal
         isOpen={isProvidersOpen}
         onClose={() => setIsProvidersOpen(false)}
+      />
+
+      <QuickSwitcherModal
+        isOpen={isSwitcherOpen}
+        onClose={() => setIsSwitcherOpen(false)}
+        onSelectNav={(id) => {
+          setActiveNav(id);
+          setIsSwitcherOpen(false);
+        }}
+      />
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
+
+      <ExecutiveBriefingModal
+        isOpen={isBriefingOpen}
+        onClose={() => setIsBriefingOpen(false)}
       />
     </div>
   );

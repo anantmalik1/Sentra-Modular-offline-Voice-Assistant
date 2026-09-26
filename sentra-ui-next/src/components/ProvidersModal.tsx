@@ -23,13 +23,13 @@ export default function ProvidersModal({ isOpen, onClose }: ProvidersModalProps)
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-6">
       <div className="hud-panel p-6 w-full max-w-lg border-cyan-400/50 shadow-[0_0_30px_rgba(0,217,255,0.3)] bg-[#071124]/95">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 mb-4 border-b border-cyan-500/20">
           <div className="flex items-center space-x-2.5">
-            <Server className="text-cyan-400" size={20} />
-            <span className="font-mono text-sm font-bold text-cyan-300 uppercase tracking-wider">
+            <Server className="text-cyan-400" size={24} />
+            <span className="font-mono text-base font-bold text-cyan-300 uppercase tracking-wider">
               MANAGE LLM INTELLIGENCE PROVIDERS
             </span>
           </div>
@@ -37,7 +37,7 @@ export default function ProvidersModal({ isOpen, onClose }: ProvidersModalProps)
             onClick={onClose}
             className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
           >
-            <X size={18} />
+            <X size={22} />
           </button>
         </div>
 
@@ -58,10 +58,10 @@ export default function ProvidersModal({ isOpen, onClose }: ProvidersModalProps)
                     }}
                   />
                   <div>
-                    <div className="font-mono text-xs font-bold text-slate-100">
+                    <div className="font-mono text-base font-bold text-slate-100">
                       {p.name}
                     </div>
-                    <div className="font-mono text-[10px] text-slate-400">
+                    <div className="font-mono text-base text-slate-400">
                       Status: <span style={{ color: p.connected ? '#22c55e' : '#94a3b8' }}>{p.status}</span>
                     </div>
                   </div>
@@ -76,11 +76,11 @@ export default function ProvidersModal({ isOpen, onClose }: ProvidersModalProps)
                     className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-400 transition-colors"
                     title="Configure Provider API Key"
                   >
-                    <Key size={13} />
+                    <Key size={17} />
                   </button>
                   <button
                     onClick={() => toggleProvider(p.id)}
-                    className={`px-3 py-1 rounded text-xs font-mono font-bold transition-all cursor-pointer ${
+                    className={`px-3 py-1 rounded text-base font-mono font-bold transition-all cursor-pointer ${
                       p.connected
                         ? 'bg-rose-950/60 border border-rose-500/40 text-rose-300 hover:bg-rose-900/80'
                         : 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-900/80'
@@ -99,11 +99,11 @@ export default function ProvidersModal({ isOpen, onClose }: ProvidersModalProps)
                     placeholder={`Enter ${p.name} API Key...`}
                     value={apiKeyInput}
                     onChange={(e) => setApiKeyInput(e.target.value)}
-                    className="flex-1 px-2.5 py-1 rounded bg-[#071124] border border-cyan-400/30 text-xs font-mono text-slate-200 focus:outline-none"
+                    className="flex-1 px-2.5 py-1 rounded bg-[#071124] border border-cyan-400/30 text-base font-mono text-slate-200 focus:outline-none"
                   />
                   <button
                     onClick={() => handleSaveKey(p.id)}
-                    className="px-3 py-1 rounded bg-cyan-950 border border-cyan-400 text-cyan-300 text-xs font-mono font-bold hover:bg-cyan-900 cursor-pointer"
+                    className="px-3 py-1 rounded bg-cyan-950 border border-cyan-400 text-cyan-300 text-base font-mono font-bold hover:bg-cyan-900 cursor-pointer"
                   >
                     Save
                   </button>
@@ -117,7 +117,7 @@ export default function ProvidersModal({ isOpen, onClose }: ProvidersModalProps)
         <div className="flex items-center justify-end pt-4 border-t border-cyan-500/20 mt-4">
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-lg text-xs font-mono font-bold bg-cyan-950 hover:bg-cyan-900 border border-cyan-400 text-cyan-300 transition-colors cursor-pointer"
+            className="px-5 py-2 rounded-lg text-base font-mono font-bold bg-cyan-950 hover:bg-cyan-900 border border-cyan-400 text-cyan-300 transition-colors cursor-pointer"
           >
             Done
           </button>

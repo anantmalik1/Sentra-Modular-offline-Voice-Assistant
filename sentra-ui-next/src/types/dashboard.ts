@@ -42,3 +42,19 @@ export interface MemoryStats {
   sessionTurns: number;
   toolCalls: number;
 }
+
+export interface MemoryItem {
+  id: string;
+  key: string;
+  value: string;
+  category: string;
+  createdAt?: string | Date;
+}
+
+export interface ConversationItem {
+  id: string;
+  title: string;
+  transcript: string;
+  intent?: string;
+  createdAt?: string | Date;
+}

@@ -27,7 +27,7 @@ export default function RootLayout({
       lang="en"
       className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="w-screen h-screen overflow-hidden bg-[#070b14] text-slate-100 font-sans">
+      <body className="w-screen min-h-screen overflow-y-auto bg-[#070b14] text-slate-100 font-sans">
         {children}
       </body>
     </html>

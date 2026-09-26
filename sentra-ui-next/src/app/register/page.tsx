@@ -4,10 +4,12 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Shield, Lock, Mail, User, AlertCircle, ArrowRight } from 'lucide-react';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -15,29 +17,37 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
 
-    if (!email || !password) {
-      setError('Email and password are required');
+    if (!name.trim()) {
+      setError('Please enter your Commander name');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Authorization passwords do not match');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
       return;
     }
 
     setLoading(true);
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), password }),
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), password }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Authentication failure');
+        setError(data.error || 'Registration failure');
         setLoading(false);
         return;
       }
 
-      // Successful login -> redirect to Command Center
+      // Successful registration -> redirect to Command Center
       router.push('/');
       router.refresh();
     } catch {
@@ -63,7 +73,7 @@ export default function LoginPage() {
             SENTRA CORE
           </h1>
           <p className="font-mono text-xs text-slate-400 tracking-wider mt-1">
-            SECURE COMMANDER AUTHORIZATION
+            OPERATOR INITIALIZATION PROTOCOL
           </p>
         </div>
 
@@ -77,6 +87,23 @@ export default function LoginPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block font-mono text-[11px] uppercase tracking-wider text-slate-300 mb-1">
+              Commander Name
+            </label>
+            <div className="flex items-center px-3 py-2 rounded-lg bg-[#0a1630] border border-cyan-400/25 focus-within:border-cyan-400 transition-colors">
+              <User size={15} className="text-slate-400 mr-2 flex-shrink-0" />
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Commander Sarah"
+                className="bg-transparent text-xs font-mono text-slate-100 placeholder-slate-500 focus:outline-none w-full"
+              />
+            </div>
+          </div>
+
           <div>
             <label className="block font-mono text-[11px] uppercase tracking-wider text-slate-300 mb-1">
               Operator Email
@@ -111,6 +138,23 @@ export default function LoginPage() {
             </div>
           </div>
 
+          <div>
+            <label className="block font-mono text-[11px] uppercase tracking-wider text-slate-300 mb-1">
+              Confirm Passcode
+            </label>
+            <div className="flex items-center px-3 py-2 rounded-lg bg-[#0a1630] border border-cyan-400/25 focus-within:border-cyan-400 transition-colors">
+              <Lock size={15} className="text-slate-400 mr-2 flex-shrink-0" />
+              <input
+                type="password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                className="bg-transparent text-xs font-mono text-slate-100 placeholder-slate-500 focus:outline-none w-full"
+              />
+            </div>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -120,7 +164,7 @@ export default function LoginPage() {
               <span>SYNCHRONIZING WITH CORE...</span>
             ) : (
               <>
-                <span>ENTER COMMAND CENTER</span>
+                <span>INITIALIZE USER & LAUNCH</span>
                 <ArrowRight size={14} />
               </>
             )}
@@ -134,15 +178,15 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Link to register */}
+        {/* Link to login */}
         <div className="mt-6 text-center">
           <p className="font-mono text-xs text-slate-400">
-            Don't have an account?{' '}
+            Already have an account?{' '}
             <a
-              href="/register"
+              href="/login"
               className="text-cyan-300 hover:text-cyan-200 font-mono underline-offset-2"
             >
-              Register
+              Login
             </a>
           </p>
         </div>

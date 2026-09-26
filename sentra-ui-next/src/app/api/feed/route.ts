@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/db';
-import { feedActivities, conversations } from '@/db/schema';
+import { feedActivities, conversations, memoryEntries } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 
 export async function GET() {
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
   await db.insert(feedActivities).values(newActivity);
 
-  // If this was voice input, also store in conversations table for this user
+  // If this was voice input, also store in conversations table and memory table for this user
   if (isVoice && transcript) {
     await db.insert(conversations).values({
       id: `conv-${Date.now()}`,
@@ -48,6 +48,16 @@ export async function POST(req: Request) {
       title: transcript.length > 30 ? transcript.slice(0, 30) + '...' : transcript,
       transcript,
       intent: 'VOICE_COMMAND',
+      createdAt: now,
+    });
+
+    // Also persist an episodic memory
+    await db.insert(memoryEntries).values({
+      id: `mem-${Date.now()}`,
+      userId: user.userId,
+      key: `Voice Command [${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}]`,
+      value: transcript,
+      category: 'episodic',
       createdAt: now,
     });
   }
